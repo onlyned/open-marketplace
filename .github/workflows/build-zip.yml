@@ -6,6 +6,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -17,9 +18,14 @@ jobs:
           extensions: mbstring, intl, curl, dom, zip, pdo, pdo_mysql, opcache
           tools: composer:v2
 
-- name: Composer install (no dev, no scripts)
-  run: COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev -o --prefer-dist --no-interaction --ignore-platform-reqs --no-scripts
-
+      # IMPORTANT: disable scripts AND plugins so Symfony Flex/auto-scripts cannot run
+      - name: Install dependencies (no dev, no scripts/plugins)
+        env:
+          COMPOSER_MEMORY_LIMIT: -1
+          COMPOSER_NO_INTERACTION: 1
+          COMPOSER_ALLOW_SUPERUSER: 1
+          COMPOSER_NO_PLUGINS: 1
+        run: composer install --no-dev -o --prefer-dist --no-progress --no-scripts --ignore-platform-reqs
 
       - name: Make release ZIP (includes vendor/)
         run: |
