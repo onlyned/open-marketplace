@@ -17,8 +17,9 @@ jobs:
           extensions: mbstring, intl, curl, dom, zip, pdo, pdo_mysql, opcache
           tools: composer:v2
 
-      - name: Composer install (no dev)
-        run: composer install --no-dev -o --prefer-dist --no-interaction
+- name: Composer install (no dev, no scripts)
+  run: COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev -o --prefer-dist --no-interaction --ignore-platform-reqs --no-scripts
+
 
       - name: Make release ZIP (includes vendor/)
         run: |
