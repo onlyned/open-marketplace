@@ -1,0 +1,33 @@
+name: Build OpenMarketplace ZIP
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, curl, dom, zip, pdo, pdo_mysql, opcache
+          tools: composer:v2
+
+      - name: Composer install (no dev)
+        run: composer install --no-dev -o --prefer-dist --no-interaction
+
+      - name: Make release ZIP (includes vendor/)
+        run: |
+          cd ..
+          zip -r open-marketplace-built.zip open-marketplace
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: open-marketplace-built
+          path: ../open-marketplace-built.zip
+          if-no-files-found: error
